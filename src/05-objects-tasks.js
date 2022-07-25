@@ -115,32 +115,64 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  arguments: '',
+  element(value) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.order = 1;
+    this.check(curObj.order);
+    curObj.arguments = `${this.arguments}${value}`;
+    return curObj;
   },
-
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.order = 2;
+    this.check(curObj.order);
+    this.hasId = true;
+    curObj.arguments = `${this.arguments}#${value}`;
+    return curObj;
   },
-
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.order = 3;
+    this.check(curObj.order);
+    curObj.arguments = `${this.arguments}.${value}`;
+    return curObj;
   },
-
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.order = 4;
+    this.check(curObj.order);
+    curObj.arguments = `${this.arguments}[${value}]`;
+    return curObj;
   },
-
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.order = 5;
+    this.check(curObj.order);
+    curObj.arguments = `${this.arguments}:${value}`;
+    return curObj;
   },
-
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.order = 6;
+    this.check(curObj.order);
+    curObj.arguments = `${this.arguments}::${value}`;
+    return curObj;
   },
-
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  stringify() {
+    const result = this.arguments;
+    return result;
+  },
+  combine(selector1, combinator, selector2) {
+    const curObj = Object.create(cssSelectorBuilder);
+    curObj.arguments = `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
+    return curObj;
+  },
+  check(order) {
+    if (this.order > order) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    if (this.order === order && (order === 1 || order === 2 || order === 6)) throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
   },
 };
 
